@@ -32,9 +32,32 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        this.load.image('logo', 'logo.png');
-        this.load.image('spill', 'spill.png');
-        this.load.image('bg-cafe', 'bg-cafe.png')
+        // Branding
+        this.load.image('logo', 'branding/logo.png');
+
+        // Backgrounds/CGs
+        this.load.image('bg-cafe', 'bgs/bg-cafe.png');
+
+        // UI
+        this.load.image('todo-box', 'ui/todo-box.png');
+
+        // SFX
+        this.load.audio('dish-clink', 'sfx/dish-clink.mp3');
+        this.load.audio('floor-sweep', 'sfx/floor-sweep.mp3');
+        this.load.audio('table-wipe', 'sfx/table-wipe.mp3');
+        this.load.audio('window-wipe', 'sfx/window-wipe.mp3');
+
+        // Obstacles
+        this.load.image('counterspill1', 'obstacles/counterspill1.png');
+        this.load.image('counterdirtyplate1', 'obstacles/counterdirtyplate1.png');
+        this.load.image('dirtyplate1', 'obstacles/dirtyplate1.png');
+        this.load.image('dirtyplate2', 'obstacles/dirtyplate2.png');
+        this.load.image('foodspill1', 'obstacles/foodspill1.png');
+        this.load.image('foodspill2', 'obstacles/foodspill2.png');
+        this.load.image('tablespill1', 'obstacles/tablespill1.png');
+        this.load.image('tablespill2', 'obstacles/tablespill2.png');
+        this.load.image('wetspill1', 'obstacles/wetspill1.png');
+        this.load.image('wetspill2', 'obstacles/wetspill2.png');
     }
 
     create ()
@@ -43,6 +66,7 @@ export class Preloader extends Scene
         //  For example, you can define global animations here, so we can use them in other scenes.
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+        this.scene.start('Game');
+        // TODO: switch back to main menu later
     }
 }
