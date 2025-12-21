@@ -16,13 +16,57 @@ export class Game extends Scene
 
 
 
-        ///////// Create timer /////////
-        /*this.timeText = this.add.text(500, 500, "00:30", {
-            fontFamily: 'qtpi', fontSize: 60, fontStyle:'bold', color: '#464248',
-            letterSpacing: 5,
-            align: 'center'
-        });*/
+        ///////// Create SFX /////////
+        let floorSFX = this.sound.add('floor-sweep');
+        let tableSFX = this.sound.add('table-wipe');
+        let dishSFX = this.sound.add('dish-clink');
+        let windowSFX = this.sound.add('window-wipe');
+        let errorSFX = this.sound.add('error-sound');
+        let tickSFX = this.sound.add('tick-sound');
 
+
+
+        ///////// Create timer /////////
+        // Note: Code is modified from this tutorial: https://phasergames.com/phaser-timer-basics-tutorial/
+        let timeLeft = 30;
+
+        this.add.image(905, 52, 'timer-box');
+        let timeText = this.add.text(865, 20, "00:30", {
+            fontFamily: 'qtpi', fontSize: 60, color: '#464248',
+            align: 'right'
+        });
+
+        this.timedEvent = this.time.addEvent({
+            delay: 1000, // 1 second
+            callback: tick,
+            callbackScope: this,
+            loop:true,
+        });
+
+        let shake = false; // this is used to stop animation from repeating / moving in place
+        function tick() {
+            timeLeft--;
+            timeText.setText(`00:${timeLeft.toString().padStart(2, '0')}`);
+            if (timeLeft <= 10) {
+                tickSFX.play();
+                if (!shake) {
+                    textShake.call(this);
+                    shake = true;
+                }
+                if (timeLeft == 5) { timeText.setColor('#ff0000') };
+            }
+        }
+        
+        function textShake() { // Tween to warn user that time is running out :(
+            this.tweens.add({
+                targets: timeText,
+                x: {from: timeText.x - 3, to: timeText.x + 3},
+                duration: 100,
+                ease: 'Sine.easeInOut',
+                yoyo: true,
+                repeat: -1
+            });
+        }
 
 
 
@@ -63,15 +107,6 @@ export class Game extends Scene
         handIcon.on('pointerdown', () => clickTool('hand'));
         ragIcon.on('pointerdown', () => clickTool('rag'));
         mopIcon.on('pointerdown', () => clickTool('mop'));
-
-
-
-        ///////// Create SFX /////////
-        let floorSFX = this.sound.add('floor-sweep');
-        let tableSFX = this.sound.add('table-wipe');
-        let dishSFX = this.sound.add('dish-clink');
-        let windowSFX = this.sound.add('window-wipe');
-        let errorSFX = this.sound.add('error-sound');
 
 
 

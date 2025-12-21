@@ -39,6 +39,7 @@ export class Preloader extends Scene
         this.load.image('bg-cafe', 'bgs/bg-cafe.png');
 
         // UI
+        this.load.image('timer-box', 'ui/timer-box.png');
         this.load.image('todo-box', 'ui/todo-box.png');
         this.load.image('handIcon', 'ui/icons/handicon.png');
         this.load.image('ragIcon', 'ui/icons/ragicon.png');
@@ -53,6 +54,7 @@ export class Preloader extends Scene
         this.load.audio('table-wipe', 'sfx/table-wipe.mp3');
         this.load.audio('window-wipe', 'sfx/window-wipe.mp3');
         this.load.audio('error-sound', 'sfx/error-sound.mp3');
+        this.load.audio('tick-sound', 'sfx/tick-sound.mp3');
 
         // Obstacles
         this.load.image('counterspill1', 'obstacles/counterspill1.png');
