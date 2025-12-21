@@ -43,12 +43,16 @@ export class Preloader extends Scene
         this.load.image('handIcon', 'ui/icons/handicon.png');
         this.load.image('ragIcon', 'ui/icons/ragicon.png');
         this.load.image('mopIcon', 'ui/icons/mopicon.png');
+        this.load.image('handIconActive', 'ui/icons/handiconActive.png');
+        this.load.image('ragIconActive', 'ui/icons/ragiconActive.png');
+        this.load.image('mopIconActive', 'ui/icons/mopiconActive.png');
 
         // SFX
         this.load.audio('dish-clink', 'sfx/dish-clink.mp3');
         this.load.audio('floor-sweep', 'sfx/floor-sweep.mp3');
         this.load.audio('table-wipe', 'sfx/table-wipe.mp3');
         this.load.audio('window-wipe', 'sfx/window-wipe.mp3');
+        this.load.audio('error-sound', 'sfx/error-sound.mp3');
 
         // Obstacles
         this.load.image('counterspill1', 'obstacles/counterspill1.png');
