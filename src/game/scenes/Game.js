@@ -10,6 +10,8 @@ export class Game extends Scene
 
     create ()
     {
+        const gameScene = this;
+
         ///////// Create background /////////
         this.cameras.main.setBackgroundColor(0x808080);
         this.add.image(512, 384, 'bg-cafe');
@@ -47,14 +49,14 @@ export class Game extends Scene
         function tick() {
             timeLeft--;
             timeText.setText(`00:${timeLeft.toString().padStart(2, '0')}`);
-            if (timeLeft <= 10) {
+            if (timeLeft <= 5) {
+                if (timeLeft <= 0) { this.endGame(false); }
                 tickSFX.play();
                 if (!shake) {
                     textShake.call(this);
                     shake = true;
+                    timeText.setColor('#ff0000')
                 }
-                if (timeLeft == 5) { timeText.setColor('#ff0000') };
-                if (timeLeft <= 0) { endGame.call(this);}
             }
         }
         
@@ -68,16 +70,6 @@ export class Game extends Scene
                 repeat: -1
             });
         }
-
-
-
-        ///////// Set ending conditions /////////
-        function endGame() {
-            this.scene.pause();
-            this.scene.launch('GameComplete');
-        }
-
-
 
         ///////// Create custom cursor /////////
         //this.input.setDefaultCursor('url(assets/ui/cursors/defaultCur.png), pointer');
@@ -161,20 +153,14 @@ export class Game extends Scene
         let windowElementCount = 0;
 
         // Helper method that updates tasks to complete style when finished
-        function updateComplete(tasksDone, tasksNeeded, textInstruction, textCount, game) {
+        function updateComplete(tasksDone, tasksNeeded, textInstruction, textCount) {
             if (tasksDone == tasksNeeded) {
                 textInstruction.setAlpha(0.5);
                 textCount.setStyle(taskCompleteStyle);
             }
             // Check Win condition
-            console.log({
-                floor: floorElementCount,
-                table: tableElementCount,
-                dish: dishElementCount,
-                window: windowElementCount
-            });
             if (floorElementCount == 4 && tableElementCount == 3 && dishElementCount == 3 && windowElementCount == 1) {
-                endGame.call();
+                gameScene.endGame(true);
             }
         }
 
@@ -247,7 +233,7 @@ export class Game extends Scene
                     floorElementCount++;
                     floorTextCount.setText('(' + floorElementCount + '/4)');
                     this.destroy();
-                    updateComplete(floorElementCount, 4, floorTodo, floorTextCount, this.scene);
+                    updateComplete(floorElementCount, 4, floorTodo, floorTextCount);
                 });
             }
             else {
@@ -270,7 +256,7 @@ export class Game extends Scene
                     tableElementCount++;
                     tableTextCount.setText('(' + tableElementCount + '/3)');
                     this.destroy();
-                    updateComplete(tableElementCount, 3, tableTodo, tableTextCount, this.scene);
+                    updateComplete(tableElementCount, 3, tableTodo, tableTextCount);
                 });
             }
             else {
@@ -289,7 +275,7 @@ export class Game extends Scene
                 spriteLift(this.scene, this);
                 dishElementCount++;
                 dishTextCount.setText('(' + dishElementCount + '/3)');
-                updateComplete(dishElementCount, 3, dishTodo, dishTextCount, this.scene);
+                updateComplete(dishElementCount, 3, dishTodo, dishTextCount);
             }
             else {
                 errorSFX.play();
@@ -309,9 +295,8 @@ export class Game extends Scene
                     windowElementCount++;
                     windowTextCount.setText('(' + windowElementCount + '/1)');
                     this.destroy();
-                    updateComplete(windowElementCount, 1, windowTodo, windowTextCount, this.scene);
+                    updateComplete(windowElementCount, 1, windowTodo, windowTextCount);
                 });
-                checkComplete(this.scene);
             }
             else {
                 errorSFX.play();
@@ -319,5 +304,13 @@ export class Game extends Scene
             }
         }
         windowspill.on('pointerdown', clickWindowElement);
+    }
+
+    ///////// Set ending conditions /////////
+    endGame(completedTasks) {
+        this.scene.pause();
+        this.scene.launch('GameComplete', {
+            completeTasks: completedTasks,
+        });
     }
 }

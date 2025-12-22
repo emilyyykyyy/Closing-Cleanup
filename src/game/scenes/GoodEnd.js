@@ -1,10 +1,10 @@
 import { Scene } from 'phaser';
 
-export class GameComplete extends Scene
+export class GoodEnd extends Scene
 {
     constructor ()
     {
-        super('GameComplete');
+        super('GoodEnd');
     }
 
     init(data) {
@@ -47,13 +47,10 @@ export class GameComplete extends Scene
             this.cameras.main.fadeOut(250);
             this.cameras.main.once('camerafadeincomplete', () => {
                 if (this.completeTasks == true) {
-                    this.scene.start('GoodEnd', {
-                        completeTasks: completedTasks,
-                    });
+                    this.scene.start('GoodEnd');
                 }
                 else {
-                    this.scene.start('MainMenu');
-                    //this.scene.start('BadEnd');
+                    this.scene.start('BadEnd');
                 }
             });
         });

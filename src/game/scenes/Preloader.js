@@ -55,6 +55,7 @@ export class Preloader extends Scene
         this.load.audio('window-wipe', 'sfx/window-wipe.mp3');
         this.load.audio('error-sound', 'sfx/error-sound.mp3');
         this.load.audio('tick-sound', 'sfx/tick-sound.mp3');
+        this.load.audio('completion-sound', 'sfx/completion-sound.mp3');
 
         // Obstacles
         this.load.image('counterspill1', 'obstacles/counterspill1.png');
