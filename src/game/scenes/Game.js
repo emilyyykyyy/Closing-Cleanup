@@ -15,7 +15,7 @@ export class Game extends Scene
         this.add.image(512, 384, 'bg-cafe');
 
 
-
+        
         ///////// Create SFX /////////
         let floorSFX = this.sound.add('floor-sweep');
         let tableSFX = this.sound.add('table-wipe');
@@ -36,7 +36,7 @@ export class Game extends Scene
             align: 'right'
         });
 
-        this.timedEvent = this.time.addEvent({
+        let timedEvent = this.time.addEvent({
             delay: 1000, // 1 second
             callback: tick,
             callbackScope: this,
@@ -54,6 +54,7 @@ export class Game extends Scene
                     shake = true;
                 }
                 if (timeLeft == 5) { timeText.setColor('#ff0000') };
+                if (timeLeft <= 0) { endGame.call(this);}
             }
         }
         
@@ -61,11 +62,19 @@ export class Game extends Scene
             this.tweens.add({
                 targets: timeText,
                 x: {from: timeText.x - 3, to: timeText.x + 3},
-                duration: 100,
+                duration: 250,
                 ease: 'Sine.easeInOut',
                 yoyo: true,
                 repeat: -1
             });
+        }
+
+
+
+        ///////// Set ending conditions /////////
+        function endGame() {
+            this.scene.pause();
+            this.scene.launch('GameComplete');
         }
 
 
@@ -124,35 +133,50 @@ export class Game extends Scene
             lineSpacing: 0.7,
             align: 'left'
         };
-        let floorTodo = this.add.text(50, 420, 'Clean up floor\nspills', todoStyle);
-        let tableTodo = this.add.text(50, 490, 'Tidy up table\nspills', todoStyle);
-        let dishTodo = this.add.text(50, 560, 'Pick up dirty\ndishes', todoStyle);
-        let windowTodo = this.add.text(50, 630, 'Clean the\nwindows', todoStyle);
-
         let taskStyle = {
             fontFamily: 'qtpi', fontSize: 25, color: '#D0755B',
             lineSpacing: 0.7,
             align: 'left'
         };
-
         let taskCompleteStyle = {
             fontFamily: 'qtpi', fontSize: 25, color: '#A3B4A1',
             lineSpacing: 0.7,
             align: 'left'
         };
 
-        // Helper method that updates tasks to complete style when finished
-        function updateComplete(tasksDone, tasksNeeded, textInstruction, textCount) {
-            if (tasksDone == tasksNeeded) {
-                textInstruction.setAlpha(0.5);
-                textCount.setStyle(taskCompleteStyle);
-            }
-        }
+        let floorTodo = this.add.text(50, 420, 'Clean up floor\nspills', todoStyle);
+        let tableTodo = this.add.text(50, 490, 'Tidy up table\nspills', todoStyle);
+        let dishTodo = this.add.text(50, 560, 'Pick up dirty\ndishes', todoStyle);
+        let windowTodo = this.add.text(50, 630, 'Clean the\nwindows', todoStyle);
 
         let floorTextCount = this.add.text(110, 450, '(0/4)', taskStyle);
         let tableTextCount = this.add.text(110, 520, '(0/3)', taskStyle);
         let dishTextCount = this.add.text(125, 590, '(0/3)', taskStyle);
         let windowTextCount = this.add.text(150, 660, '(0/1)', taskStyle);
+
+        //// Set click counters for each todo
+        let floorElementCount = 0;
+        let tableElementCount = 0;
+        let dishElementCount = 0; 
+        let windowElementCount = 0;
+
+        // Helper method that updates tasks to complete style when finished
+        function updateComplete(tasksDone, tasksNeeded, textInstruction, textCount, game) {
+            if (tasksDone == tasksNeeded) {
+                textInstruction.setAlpha(0.5);
+                textCount.setStyle(taskCompleteStyle);
+            }
+            // Check Win condition
+            console.log({
+                floor: floorElementCount,
+                table: tableElementCount,
+                dish: dishElementCount,
+                window: windowElementCount
+            });
+            if (floorElementCount == 4 && tableElementCount == 3 && dishElementCount == 3 && windowElementCount == 1) {
+                endGame.call();
+            }
+        }
 
 
 
@@ -169,12 +193,6 @@ export class Game extends Scene
         let wetspill1 = this.add.sprite(619, 629, 'wetspill1').setInteractive();
         let wetspill2 = this.add.sprite(586, 465, 'wetspill2').setInteractive();
         let windowspill = this.add.sprite(431, 295, 'windowspill').setInteractive();
-
-        //// Set click counters and effects for each group
-        let floorElementCount = 0;
-        let tableElementCount = 0;
-        let dishElementCount = 0; 
-        let windowElementCount = 0;
 
         /// Create animation for obstacle interaction:
         function spriteShake(scene, sprite, alphaVal, onGone) { // Used for spills
@@ -208,19 +226,34 @@ export class Game extends Scene
             });
         }
 
+        function spriteError(scene, sprite) { // Used when user incorrectly click on obj w/ wrong tool
+            scene.tweens.add({
+                targets: sprite,
+                x: sprite.x+3,
+                duration: 50,
+                ease: 'Sine.easeInOut',
+                yoyo: true,
+                repeat: 0,
+                onComplete: () => {sprite.setInteractive();},
+            });
+        }
+
         ////// Floor
         const clickFloorElement = function() {
+            this.disableInteractive();
             if (toolUsed === 'mop') {
-                this.disableInteractive();
                 floorSFX.play();
                 spriteShake(this.scene, this, 0.33, () => {
                     floorElementCount++;
                     floorTextCount.setText('(' + floorElementCount + '/4)');
                     this.destroy();
-                    updateComplete(floorElementCount, 4, floorTodo, floorTextCount);
+                    updateComplete(floorElementCount, 4, floorTodo, floorTextCount, this.scene);
                 });
             }
-            else {errorSFX.play();}
+            else {
+                errorSFX.play();
+                spriteError(this.scene, this);
+            }
         }
 
         foodspill1.on('pointerdown', clickFloorElement);
@@ -230,17 +263,20 @@ export class Game extends Scene
         
         ////// Table
         const clickTableElement = function() {
+            this.disableInteractive();
             if (toolUsed === 'rag') {
-                this.disableInteractive();
                 tableSFX.play();
                 spriteShake(this.scene, this, 0.5, () => {
                     tableElementCount++;
                     tableTextCount.setText('(' + tableElementCount + '/3)');
                     this.destroy();
-                    updateComplete(tableElementCount, 3, tableTodo, tableTextCount);
+                    updateComplete(tableElementCount, 3, tableTodo, tableTextCount, this.scene);
                 });
             }
-            else {errorSFX.play();}
+            else {
+                errorSFX.play();
+                spriteError(this.scene, this);
+            }
         }
         tablespill1.on('pointerdown', clickTableElement);
         tablespill2.on('pointerdown', clickTableElement);
@@ -253,9 +289,12 @@ export class Game extends Scene
                 spriteLift(this.scene, this);
                 dishElementCount++;
                 dishTextCount.setText('(' + dishElementCount + '/3)');
-                updateComplete(dishElementCount, 3, dishTodo, dishTextCount);
+                updateComplete(dishElementCount, 3, dishTodo, dishTextCount, this.scene);
             }
-            else {errorSFX.play();}
+            else {
+                errorSFX.play();
+                spriteError(this.scene, this);
+            }
         }
         dirtyplate1.on('pointerdown', clickDishElement);
         dirtyplate2.on('pointerdown', clickDishElement);
@@ -263,17 +302,21 @@ export class Game extends Scene
 
         ////// Windows
         const clickWindowElement = function() {
+            this.disableInteractive(); // Disables double click bugs
             if (toolUsed === 'rag') {
-                this.disableInteractive(); // Disables double click bugs
                 windowSFX.play();
                 spriteShake(this.scene, this, 0.5, () => {
                     windowElementCount++;
                     windowTextCount.setText('(' + windowElementCount + '/1)');
                     this.destroy();
-                    updateComplete(windowElementCount, 1, windowTodo, windowTextCount);
+                    updateComplete(windowElementCount, 1, windowTodo, windowTextCount, this.scene);
                 });
+                checkComplete(this.scene);
             }
-            else {errorSFX.play();}
+            else {
+                errorSFX.play();
+                spriteError(this.scene, this);
+            }
         }
         windowspill.on('pointerdown', clickWindowElement);
     }
