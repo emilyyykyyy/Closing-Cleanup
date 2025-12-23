@@ -9,8 +9,6 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
-        this.add.image(512, 384, 'background');
 
         //  A simple progress bar. This is the outline of the bar.
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
@@ -37,10 +35,14 @@ export class Preloader extends Scene
 
         // Backgrounds/CGs
         this.load.image('bg-cafe', 'bgs/bg-cafe.png');
+        this.load.image('cg-badend', 'bgs/cg-badend.png');
+        this.load.image('cg-goodend', 'bgs/cg-goodend.png');
 
         // UI
         this.load.image('timer-box', 'ui/timer-box.png');
         this.load.image('todo-box', 'ui/todo-box.png');
+        this.load.image('text-box', 'ui/text-box.png');
+        this.load.image('arrow-next', 'ui/arrow-next.png');
         this.load.image('handIcon', 'ui/icons/handicon.png');
         this.load.image('ragIcon', 'ui/icons/ragicon.png');
         this.load.image('mopIcon', 'ui/icons/mopicon.png');
@@ -77,7 +79,10 @@ export class Preloader extends Scene
         //  For example, you can define global animations here, so we can use them in other scenes.
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('Game');
+        this.scene.start('GoodEnd', {
+            badEndFound: false,
+            GoodEndFound: false,
+        });
         // TODO: switch back to main menu later
     }
 }

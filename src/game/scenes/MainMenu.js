@@ -7,8 +7,16 @@ export class MainMenu extends Scene
         super('MainMenu');
     }
 
+    init(data) {
+        this.badEndFound = true;
+        this.goodEndFound = data.goodEndFound;
+    }
+
     create ()
     {
+        console.log('switched');
+        this.input.enabled = true;
+        this.cameras.main.fadeIn(250);
         this.add.image(512, 384, 'background');
 
         this.add.image(512, 300, 'logo');

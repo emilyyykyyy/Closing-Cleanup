@@ -8,6 +8,11 @@ export class Game extends Scene
         super('Game');
     }
 
+    init(data) {
+        this.badEndFound = data.badEndFound;
+        this.goodEndFound = data.goodEndFound;
+    }
+
     create ()
     {
         const gameScene = this;
@@ -310,6 +315,8 @@ export class Game extends Scene
     endGame(completedTasks) {
         this.scene.pause();
         this.scene.launch('GameComplete', {
+            badEndFound: this.badEndFound,
+            goodEndFound: this.goodEndFound,
             completeTasks: completedTasks,
         });
     }

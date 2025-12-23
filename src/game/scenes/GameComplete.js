@@ -9,6 +9,8 @@ export class GameComplete extends Scene
 
     init(data) {
         this.completeTasks = data.completeTasks;
+        this.badEndFound = data.badEndFound;
+        this.goodEndFound = data.goodEndFound;
     }
 
     create ()
@@ -42,18 +44,21 @@ export class GameComplete extends Scene
 
         this.input.once('pointerdown', () => {
             this.input.enabled = false;
-            this.scene.stop('Game'); // Remove Game
 
-            this.cameras.main.fadeOut(250);
-            this.cameras.main.once('camerafadeincomplete', () => {
+            this.cameras.main.fadeOut(1000);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                this.scene.stop('Game'); // Remove Game
                 if (this.completeTasks == true) {
                     this.scene.start('GoodEnd', {
-                        completeTasks: completedTasks,
+                        badEndFound: this.badEndFound,
+                        goodEndFound: this.goodEndFound,
                     });
                 }
                 else {
-                    this.scene.start('MainMenu');
-                    //this.scene.start('BadEnd');
+                    this.scene.start('BadEnd', {
+                        badEndFound: this.badEndFound,
+                        goodEndFound: this.goodEndFound,
+                    });
                 }
             });
         });

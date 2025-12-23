@@ -8,51 +8,89 @@ export class BadEnd extends Scene
     }
 
     init(data) {
-        this.completeTasks = data.completeTasks;
+        this.badEndFound = true;
+        this.goodEndFound = data.goodEndFound;
     }
 
     create ()
     {
+        this.cameras.main.fadeIn(500);
+        this.sys.game.canvas.style.cursor = 'url(assets/ui/cursors/defaultCur.png) 0 0, auto';
+
+        ///////// Create Background + Textbox /////////
+        let cg = this.add.image(512, 384, 'cg-badend');
+        let textbox = this.add.image(512, 644, 'text-box');
+        let arrownext = this.add.image(943, 720, 'arrow-next');
+        let arrowStart = false; // use later so animation doesn't play on repeat
+        
+
         ///////// Create SFX /////////
-        this.sound.add('completion-sound').play();
+        
 
-        this.input.enabled = false; // Initially let the scene transition before allowing user to move to next scene
 
-        let tint = this.add.rectangle(512,384,1024,768,0xffffff, 0.4).setOrigin(0.5).setAlpha(0); // White tint over entire screen
-        let finishText = this.add.text(512, 384, 'Finish!', {
-            fontFamily: 'qtpi', fontSize: 120, fontStyle:'bold', color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5).setAlpha(0);
-        let instructionText = this.add.text(512, 474, 'Click to continue', {
-            fontFamily: 'qtpi', fontSize: 30, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 4,
-            align: 'center',
-        }).setOrigin(0.5).setAlpha(0);
+        ///////// Create text w/ typewriter effect /////////\
+        // Code is from https://blog.ourcade.co/posts/2020/phaser-3-typewriter-text-effect-bitmap/
+        let endingsFound = 0;
+        if (this.badEndFound) { endingsFound++; }
+        if (this.goodEndFound) { endingsFound++; }
 
-        this.tweens.add({
-            targets: [tint, finishText, instructionText],
-            alpha: {from: 0, to: 1},
-            duration: 500,
-            ease: 'Sine.easeIn',
-            onComplete:  () => {
-                this.input.enabled = true;
+        let finishedTyping = false;
+
+        let message = `You could not clean everything in time and got fired on the\nspot ... I guess it's on to searching for a new job...\n\nBad End (Found ${endingsFound.toString()}/2 endings).`;
+        let typedText = this.add.text(512, 636, 
+            '', {
+            fontFamily: 'qtpi', fontSize: 40, color: '#464248',
+        }).setOrigin(0.5);
+        let typeAnimation = this.tweens.add({
+                                targets: arrownext,
+                                x: {from: arrownext.x - 10, to: arrownext.x + 10 },
+                                duration: 1000,
+                                ease: 'Sine.easeInOut',
+                                yoyo: true,
+                                repeat: -1,
+                                paused: true,
+                            });
+        let i = 0;
+        let typingText = this.time.addEvent({
+            delay: 25, 
+            loop: true, 
+            callback: () =>{
+                if (i < message.length) {
+                    typedText.text += message[i];
+                    i++;
+                } else {
+                    typingText.remove();
+                    finishedTyping = true;
+                    this.input.enabled = true;
+                    if (!arrowStart) {
+                        typeAnimation.play();
+                        arrowStart = true;
+                    }
+                }
             }
-        })
-
-        this.input.once('pointerdown', () => {
-            this.input.enabled = false;
-            this.scene.stop('Game'); // Remove Game
-
-            this.cameras.main.fadeOut(250);
-            this.cameras.main.once('camerafadeincomplete', () => {
-                if (this.completeTasks == true) {
-                    this.scene.start('GoodEnd');
+        });
+        
+        this.input.on('pointerdown', () => {
+            if (!finishedTyping) {
+                typingText.remove();
+                typedText.text = message;
+                finishedTyping = true;
+                this.input.enabled = true;
+                if (!arrowStart) {
+                    typeAnimation.play();
+                    arrowStart = true;
                 }
-                else {
-                    this.scene.start('BadEnd');
-                }
-            });
+            }
+            else{
+                this.input.enabled = false;
+                this.cameras.main.fadeOut(250);
+                this.cameras.main.once('camerafadeoutcomplete', () => {
+                    this.scene.start('MainMenu', {
+                        badEndFound: this.badEndFound,
+                        goodEndFound: this.goodEndFound,
+                    });
+                });
+            }
         });
     }
 }
