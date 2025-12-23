@@ -2,6 +2,8 @@
 
 A short, Phaser point and click game about cleaning up a cafe. Wipe down some tables, return dirty dishes, or choose to do nothing <small>(as if they would fire you ... right?)</small>. 
 
+Made for [Codex's December 2025 Challenge: Game Jam](https://www.codedex.io/community/monthly-challenge/SyGFUPnD7myNHfEmzoJr)!
+
 
 
 ### HOW TO PLAY: 
