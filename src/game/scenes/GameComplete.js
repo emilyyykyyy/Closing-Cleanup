@@ -48,6 +48,7 @@ export class GameComplete extends Scene
             this.cameras.main.fadeOut(500);
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.scene.stop('Game'); // Remove Game
+                this.scene.restart('Game');
                 if (this.completeTasks == true) {
                     this.scene.start('GoodEnd', {
                         badEndFound: this.badEndFound,
